@@ -4,7 +4,7 @@
   gather_facts: false
 
   vars:
-    okd_version: "4.15.0-0.okd-2024-03-10-010116"
+    okd_version: "4.19.0-okd-scos.10"
     arch: "x86_64"
     base_folder: "/home/user/okd_iso_temp"
     base_folder_prod: "/home/user/okd_iso"
@@ -88,21 +88,9 @@
         path: "{{ base_folder }}/openshift-install"
         mode: '0755'
 
-    - name: Retrieve the FCOS ISO URL
-      ansible.builtin.shell: |
-        set -o pipefail
-        ISO_URL=$({{ base_folder }}/openshift-install coreos print-stream-json | grep location | grep {{ arch }} | grep iso | cut -d\" -f4)
-        echo $ISO_URL
-      register: iso_url_result
-      changed_when: false
-
-    - name: Verify ISO URL
-      ansible.builtin.debug:
-        msg: "The ISO URL is {{ iso_url_result.stdout }}"
-
     - name: Download the FCOS ISO file
       ansible.builtin.get_url:
-        url: "{{ iso_url_result.stdout }}"
+        url: https://cloud.centos.org/centos/scos/9/prod/streams/latest/x86_64/scos-9.0.20250510-0-live-iso.x86_64.iso
         dest: "{{ base_folder }}/fedora-coreos.iso"
         mode: "0644"
 
@@ -182,3 +170,4 @@
         path: "{{ base_folder }}"
         state: absent
       when: not is_debug
+
